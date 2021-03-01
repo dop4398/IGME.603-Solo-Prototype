@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,12 +10,15 @@ public class PlayerController : MonoBehaviour
     #region Field Declarations
     [SerializeField] private Camera camera;
     [SerializeField] private Rigidbody body;
+    [SerializeField] private float acceleration = 0.01f;
+    [SerializeField] private float deceleration = 0.01f;
     [SerializeField] private float maxSpeed = 1.0f;
     [SerializeField] private float jumpForce = 100.0f;
     [SerializeField] private Vector3 gravity = new Vector3(0.0f, -0.1f, 0.0f);
 
     private bool grounded = false;
     private Vector3 cameraForward;
+    private Vector3 cameraRight;
     #endregion
 
     void Start()
@@ -53,35 +57,61 @@ public class PlayerController : MonoBehaviour
     private void MoveLateral()
     {
         cameraForward = new Vector3(camera.transform.forward.x, 0.0f, camera.transform.forward.z);
+        cameraRight = new Vector3(camera.transform.right.x, 0.0f, camera.transform.right.z);
 
-        if (Input.GetKeyDown(KeyCode.W))
+        // while a key is down, accelerate to maxSpeed
+        if (Input.GetKey(KeyCode.W))
         {
-            body.AddForce(cameraForward * maxSpeed);
-        } 
-        else if(Input.GetKeyDown(KeyCode.S))
+            Accelerate(cameraForward);
+        }
+        else if (Input.GetKey(KeyCode.S))
         {
-            body.AddForce(cameraForward * -1 * maxSpeed);
+            Accelerate(cameraForward * -1.0f);
         }
 
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKey(KeyCode.A))
         {
-            body.AddForce(camera.transform.right * -1 * maxSpeed);
+            Accelerate(cameraRight * -1.0f);
         }
-        else if (Input.GetKeyDown(KeyCode.D))
+        else if (Input.GetKey(KeyCode.D))
         {
-            body.AddForce(camera.transform.right * maxSpeed);
+            Accelerate(cameraRight);
+        }
+
+        // otherwise, decelerate when grounded and a key isn't pressed
+        if (grounded && !(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)))
+        {
+            Decelerate();
         }
     }
 
-    private void ApplyDrag()
+    private void Decelerate()
     {
-        body.velocity -= body.velocity * 0.01f;
+        if (body.velocity.sqrMagnitude > 0.1f)
+        {
+            AddVelocity(body.velocity.normalized * maxSpeed * -deceleration); // decelerate by a percentage of maxSpeed per tick
+        }
+        else
+        {
+            body.velocity = Vector3.zero;
+        }
+    }
+
+    private void Accelerate(Vector3 direction)
+    {
+        AddVelocity(direction.normalized * maxSpeed * acceleration);
+
+        if (body.velocity.sqrMagnitude < maxSpeed * maxSpeed)
+        {
+            body.velocity = body.velocity.normalized * maxSpeed;
+        }
     }
 
     private void AddVelocity(Vector3 v)
     {
         body.velocity += v;
     }
+
 
     private void Jump()
     {
