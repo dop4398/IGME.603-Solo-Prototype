@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMODUnity;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,6 +32,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpTimer = 0.0f;
     [SerializeField] private float jumpTimeLimit = 0.5f;
     [SerializeField] private int jumpStage = 0;
+
     #endregion
 
     void Start()
@@ -143,11 +145,13 @@ public class PlayerController : MonoBehaviour
                 {
                     body.AddForce(transform.up * jumpForce * 0.5f);
                     AddVelocity(body.velocity.normalized * jumpForce);
+                    FMODUnity.RuntimeManager.PlayOneShot("event:/Jumps/Back Jump");
                 }
                 else
                 {
                     body.AddForce(transform.up * jumpForce * 2.0f);
                     body.AddForce(camera.transform.forward * jumpForce * -0.25f);
+                    FMODUnity.RuntimeManager.PlayOneShot("event:/Jumps/Back Jump");
                 }
             }
             else
@@ -159,26 +163,31 @@ public class PlayerController : MonoBehaviour
                         {
                             jumpStage = 2;
                             body.AddForce(transform.up * jumpForce * 1.5f);
+                            FMODUnity.RuntimeManager.PlayOneShot("event:/Jumps/Jump2");
                         }
                         else
                         {
                             body.AddForce(transform.up * jumpForce);
+                            FMODUnity.RuntimeManager.PlayOneShot("event:/Jumps/Jump1");
                         }
                         break;
                     case 2:
                         if (jumpTimer < jumpTimeLimit)
                         {
                             body.AddForce(transform.up * jumpForce * 2.0f);
+                            FMODUnity.RuntimeManager.PlayOneShot("event:/Jumps/Jump3");
                         }
                         else
                         {
                             body.AddForce(transform.up * jumpForce);
+                            FMODUnity.RuntimeManager.PlayOneShot("event:/Jumps/Jump1");
                         }
                         jumpStage = 0;
                         break;
                     default:
                         body.AddForce(transform.up * jumpForce);
                         jumpStage = 1;
+                        FMODUnity.RuntimeManager.PlayOneShot("event:/Jumps/Jump1");
                         break;
                 }
                 jumpTimer = 0.0f;
@@ -198,11 +207,13 @@ public class PlayerController : MonoBehaviour
     private void WallBonk(Vector3 v)
     {
         AddVelocity(new Vector3(v.x, 0.0f, v.z).normalized * maxSpeed * 50.0f);
+        FMODUnity.RuntimeManager.PlayOneShot("event:/Wall Bonk");
     }
 
     private void EnemyStomp()
     {
         body.AddForce(transform.up * jumpForce * 0.5f);
+        FMODUnity.RuntimeManager.PlayOneShot("event:/Stomp");
     }
 
 
