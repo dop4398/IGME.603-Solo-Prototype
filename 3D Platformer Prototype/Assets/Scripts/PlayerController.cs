@@ -51,17 +51,17 @@ public class PlayerController : MonoBehaviour
     }
 
     /* TODO:
-     * Move by applying a force in the given direction.
-     * Deccelerate when the input stops IFF the player is on the ground.
-     * Do not apply lateral force while airborne.
-     * Jump on input IFF on the ground.
-     * Multiple jumps in a row (~.5s between landing and jumping) will change the vertical jump force.
-     * When crouched, if the jump button is pressed, do a unique jump.
+     ** Move by applying a force in the given direction.
+     ** Deccelerate when the input stops IFF the player is on the ground.
+     ** Do not apply lateral force while airborne.
+     ** Jump on input IFF on the ground.
+     ** Multiple jumps in a row (~.5s between landing and jumping) will change the vertical jump force.
+     ** When crouched, if the jump button is pressed, do a unique jump.
      * When crouched and moving in a direction and the player jumps, do unique jumps.
-     * If airborne and a collision with a wall is detected, bonk off the wall - set velocity to 0, add a force opposite to the previous velocity, deccel does the rest.
+     ** If airborne and a collision with a wall is detected, bonk off the wall - set velocity to 0, add a force opposite to the previous velocity, deccel does the rest.
     */
 
-    
+    #region Player Movement
     private void MovePlayer()
     {
         // Only apply drag if on the ground. ignore if airborne.
@@ -128,7 +128,6 @@ public class PlayerController : MonoBehaviour
 
         }
     }
-
 
     private void Jump()
     {
@@ -215,7 +214,7 @@ public class PlayerController : MonoBehaviour
         body.AddForce(transform.up * jumpForce * 0.5f);
         FMODUnity.RuntimeManager.PlayOneShot("event:/Stomp");
     }
-
+    #endregion
 
     #region Helper Methods
     // make lateral movement use 2D vectors??
